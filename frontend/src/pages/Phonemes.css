@@ -1,0 +1,286 @@
+/* Phonemes Page Styles */
+
+.phonemes {
+    padding: var(--space-6) var(--space-4);
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .phonemes {
+        padding: var(--space-8);
+    }
+}
+
+.phonemes-loading,
+.phonemes-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: var(--space-4);
+    color: var(--text-secondary);
+}
+
+/* Header */
+.phonemes__header {
+    margin-bottom: var(--space-6);
+}
+
+.phonemes__title-section {
+    margin-bottom: var(--space-6);
+}
+
+.phonemes__title {
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.phonemes__subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+}
+
+/* Filters */
+.phonemes__filters {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+    .phonemes__filters {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.phonemes__search {
+    position: relative;
+    flex: 1;
+    max-width: 320px;
+}
+
+.phonemes__search-icon {
+    position: absolute;
+    left: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+    pointer-events: none;
+}
+
+.phonemes__search-input {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    padding-left: calc(var(--space-3) + 18px + var(--space-2));
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    background-color: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.phonemes__search-input:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: var(--shadow-focus);
+}
+
+.phonemes__search-input::placeholder {
+    color: var(--text-disabled);
+}
+
+/* Tabs */
+.phonemes__tabs {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.phonemes__tab {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--text-secondary);
+    background-color: transparent;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.phonemes__tab:hover {
+    background-color: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+.phonemes__tab--active {
+    background-color: var(--color-primary-500);
+    color: white;
+    border-color: var(--color-primary-500);
+}
+
+.phonemes__tab--active:hover {
+    background-color: var(--color-primary-600);
+}
+
+/* Grid */
+.phonemes__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+}
+
+@media (min-width: 480px) {
+    .phonemes__grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 640px) {
+    .phonemes__grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .phonemes__grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .phonemes__grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+.phonemes__no-results {
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--text-secondary);
+}
+
+/* Phoneme Card */
+.phoneme-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-4);
+    text-align: center;
+    cursor: pointer;
+}
+
+.phoneme-card__symbol {
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    color: var(--color-primary-600);
+    margin-bottom: var(--space-2);
+    font-family: var(--font-family-mono);
+}
+
+.phoneme-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.phoneme-card__arpabet {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--text-primary);
+    font-family: var(--font-family-mono);
+}
+
+.phoneme-card__example {
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+}
+
+.phoneme-card__action {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1);
+    color: var(--text-tertiary);
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+
+.phoneme-card:hover .phoneme-card__action {
+    opacity: 1;
+}
+
+.phoneme-card__action:hover {
+    color: var(--text-primary);
+}
+
+/* Phoneme Detail Modal */
+.phoneme-detail__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.phoneme-detail__symbol {
+    font-size: var(--text-5xl);
+    font-weight: var(--font-bold);
+    color: var(--color-primary-600);
+    font-family: var(--font-family-mono);
+}
+
+.phoneme-detail__meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.phoneme-detail__arpabet {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    font-family: var(--font-family-mono);
+}
+
+.phoneme-detail__category {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-transform: capitalize;
+}
+
+.phoneme-detail__section {
+    margin-bottom: var(--space-4);
+}
+
+.phoneme-detail__section h3 {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.phoneme-detail__section p {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    line-height: var(--leading-relaxed);
+}
+
+.phoneme-detail__example {
+    font-size: var(--text-lg);
+}

@@ -1,0 +1,195 @@
+/* Admin Profile Page Styles */
+
+.admin-profile {
+    padding: var(--space-6) var(--space-4);
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .admin-profile {
+        padding: var(--space-8);
+    }
+}
+
+.admin-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: var(--space-4);
+    color: var(--text-secondary);
+}
+
+/* Admin Banner */
+.admin-banner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    background: linear-gradient(135deg, var(--color-warning-500), var(--color-warning-600));
+    border-radius: var(--radius-xl);
+    color: white;
+    margin-bottom: var(--space-8);
+}
+
+@media (min-width: 768px) {
+    .admin-banner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-6) var(--space-8);
+    }
+}
+
+.admin-banner__content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.admin-banner__content svg {
+    flex-shrink: 0;
+}
+
+.admin-banner__text h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+    margin: 0 0 var(--space-1) 0;
+}
+
+.admin-banner__text p {
+    font-size: var(--text-sm);
+    opacity: 0.9;
+    margin: 0;
+}
+
+.admin-banner__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-decoration: none;
+}
+
+.admin-banner__link:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Section Title */
+.admin-section-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4) 0;
+}
+
+/* Admin Stats */
+.admin-stats {
+    margin-bottom: var(--space-8);
+}
+
+.admin-stats__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+    .admin-stats__grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Admin Actions */
+.admin-actions {
+    margin-bottom: var(--space-8);
+}
+
+.admin-actions__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+    .admin-actions__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .admin-actions__grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.admin-action-card {
+    padding: 0;
+}
+
+.admin-action-card__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    text-decoration: none;
+    color: inherit;
+}
+
+.admin-action-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    background: var(--color-warning-50);
+    color: var(--color-warning-600);
+    flex-shrink: 0;
+}
+
+.admin-action-card__content {
+    flex: 1;
+}
+
+.admin-action-card__content h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-1) 0;
+}
+
+.admin-action-card__content p {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.admin-action-card__arrow {
+    color: var(--text-tertiary);
+    transition: transform var(--transition-fast), color var(--transition-fast);
+}
+
+.admin-action-card:hover .admin-action-card__arrow {
+    transform: translateX(4px);
+    color: var(--text-primary);
+}
+
+/* Profile Section */
+.admin-profile-section {
+    margin-top: var(--space-8);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--border-primary);
+}
+
+.admin-profile-section .profile {
+    padding: 0;
+}
+
+.admin-profile-section .profile__header {
+    margin-bottom: var(--space-6);
+}

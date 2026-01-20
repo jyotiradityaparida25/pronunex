@@ -1,0 +1,278 @@
+/* AudioRecorder Component Styles */
+
+.audio-recorder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    background-color: var(--surface-primary);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-primary);
+}
+
+.audio-recorder--disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Display area */
+.audio-recorder__display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 160px;
+    padding: var(--space-6);
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+}
+
+/* Idle state */
+.audio-recorder__idle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--text-tertiary);
+    text-align: center;
+}
+
+.audio-recorder__mic-icon {
+    color: var(--color-primary-400);
+}
+
+/* Recording state */
+.audio-recorder__recording {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.audio-recorder__waveform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 80px;
+}
+
+.audio-recorder__bar {
+    width: 4px;
+    background: linear-gradient(to top,
+            var(--color-primary-500),
+            var(--color-primary-300));
+    border-radius: var(--radius-full);
+    animation: waveform 0.5s ease-in-out infinite alternate;
+}
+
+.audio-recorder__recording-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-error-500);
+    font-weight: var(--font-medium);
+}
+
+.audio-recorder__pulse {
+    width: 12px;
+    height: 12px;
+    background-color: var(--color-error-500);
+    border-radius: var(--radius-full);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+/* Processing state */
+.audio-recorder__processing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--text-secondary);
+}
+
+/* Playback state */
+.audio-recorder__playback {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.audio-recorder__play-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background-color: var(--color-primary-500);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.audio-recorder__play-btn:hover {
+    background-color: var(--color-primary-600);
+    transform: scale(1.05);
+}
+
+.audio-recorder__play-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+.audio-recorder__audio-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.audio-recorder__audio-info span:first-child {
+    font-weight: var(--font-medium);
+    color: var(--text-primary);
+}
+
+.audio-recorder__duration {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+}
+
+/* Timer */
+.audio-recorder__timer {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-1);
+}
+
+.audio-recorder__time {
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.audio-recorder__max-time {
+    font-size: var(--text-lg);
+    color: var(--text-tertiary);
+}
+
+/* Progress bar */
+.audio-recorder__progress {
+    width: 100%;
+    height: 6px;
+    background-color: var(--bg-tertiary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.audio-recorder__progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg,
+            var(--color-primary-400),
+            var(--color-primary-600));
+    border-radius: var(--radius-full);
+    transition: width 0.1s linear;
+}
+
+/* Controls */
+.audio-recorder__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+}
+
+.audio-recorder__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+    border: none;
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.audio-recorder__btn:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+.audio-recorder__btn--record {
+    background-color: var(--color-primary-500);
+    color: white;
+}
+
+.audio-recorder__btn--record:hover {
+    background-color: var(--color-primary-600);
+}
+
+.audio-recorder__btn--stop {
+    background-color: var(--color-error-500);
+    color: white;
+}
+
+.audio-recorder__btn--stop:hover {
+    background-color: var(--color-error-600);
+}
+
+.audio-recorder__btn--retry {
+    background-color: var(--interactive-secondary);
+    color: var(--text-primary);
+}
+
+.audio-recorder__btn--retry:hover {
+    background-color: var(--interactive-secondary-hover);
+}
+
+.audio-recorder__btn--submit {
+    background-color: var(--color-success-500);
+    color: white;
+}
+
+.audio-recorder__btn--submit:hover {
+    background-color: var(--color-success-600);
+}
+
+.audio-recorder__btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Hint */
+.audio-recorder__hint {
+    font-size: var(--text-sm);
+    color: var(--text-tertiary);
+    text-align: center;
+}
+
+/* Error states */
+.audio-recorder--unsupported .audio-recorder__error,
+.audio-recorder--denied .audio-recorder__error,
+.audio-recorder--error .audio-recorder__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-8);
+    text-align: center;
+    color: var(--color-error-500);
+}
+
+.audio-recorder__error h3 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.audio-recorder__error p {
+    color: var(--text-secondary);
+    max-width: 400px;
+    margin: 0;
+}

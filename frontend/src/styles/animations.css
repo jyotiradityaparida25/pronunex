@@ -1,0 +1,415 @@
+/* ============================================
+   PRONUNEX ANIMATIONS & MOTION SYSTEM
+   Centralized keyframes, transitions, and effects
+   ============================================ */
+
+/* ----------------------------------------
+   KEYFRAME ANIMATIONS
+   ---------------------------------------- */
+
+/* Fade animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scale animations */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes scaleOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+/* Slide animations */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Spinner animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Pulse animation for recording */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes pulseRing {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Bounce animation */
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    50% {
+        transform: translateY(-25%);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+/* Shake animation for errors */
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-4px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(4px);
+    }
+}
+
+/* Skeleton loading shimmer */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Waveform visualization */
+@keyframes waveform {
+
+    0%,
+    100% {
+        transform: scaleY(0.5);
+    }
+
+    50% {
+        transform: scaleY(1);
+    }
+}
+
+/* Toast slide */
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-100%) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes toastSlideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-100%) scale(0.95);
+    }
+}
+
+/* ----------------------------------------
+   ANIMATION UTILITY CLASSES
+   ---------------------------------------- */
+
+.animate-fadeIn {
+    animation: fadeIn var(--transition-base) ease-out forwards;
+}
+
+.animate-fadeInUp {
+    animation: fadeInUp var(--transition-slow) ease-out forwards;
+}
+
+.animate-fadeInDown {
+    animation: fadeInDown var(--transition-slow) ease-out forwards;
+}
+
+.animate-scaleIn {
+    animation: scaleIn var(--transition-base) ease-out forwards;
+}
+
+.animate-slideInRight {
+    animation: slideInRight var(--transition-slow) ease-out forwards;
+}
+
+.animate-slideInLeft {
+    animation: slideInLeft var(--transition-slow) ease-out forwards;
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-bounce {
+    animation: bounce 1s infinite;
+}
+
+.animate-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* ----------------------------------------
+   3D TRANSFORM UTILITIES
+   ---------------------------------------- */
+
+:root {
+    --perspective-sm: 500px;
+    --perspective-md: 1000px;
+    --perspective-lg: 2000px;
+
+    --rotate-subtle: 2deg;
+    --rotate-moderate: 5deg;
+    --rotate-dramatic: 12deg;
+}
+
+.perspective-container {
+    perspective: var(--perspective-md);
+}
+
+.transform-3d {
+    transform-style: preserve-3d;
+}
+
+/* 3D Card hover effect */
+.card-3d {
+    transition: transform var(--transition-slow), box-shadow var(--transition-slow);
+    transform-style: preserve-3d;
+}
+
+.card-3d:hover {
+    transform: translateY(-4px) rotateX(var(--rotate-subtle)) rotateY(var(--rotate-subtle));
+    box-shadow: var(--shadow-xl);
+}
+
+/* ----------------------------------------
+   MOTION PREFERENCES
+   Respect user's reduced motion preference
+   ---------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ----------------------------------------
+   HOVER & FOCUS STATES
+   ---------------------------------------- */
+
+.hover-lift {
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.hover-scale {
+    transition: transform var(--transition-fast);
+}
+
+.hover-scale:hover {
+    transform: scale(1.02);
+}
+
+.hover-scale:active {
+    transform: scale(0.98);
+}
+
+/* Focus visible styles */
+.focus-ring:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+.focus-ring-error:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-error);
+}
+
+/* ----------------------------------------
+   SKELETON LOADING
+   ---------------------------------------- */
+
+.skeleton {
+    background: linear-gradient(90deg,
+            var(--color-neutral-200) 0%,
+            var(--color-neutral-100) 50%,
+            var(--color-neutral-200) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-md);
+}
+
+.skeleton-text {
+    height: 1em;
+    margin-bottom: 0.5em;
+}
+
+.skeleton-circle {
+    border-radius: var(--radius-full);
+}
+
+/* ----------------------------------------
+   PAGE TRANSITIONS
+   ---------------------------------------- */
+
+.page-enter {
+    opacity: 0;
+    transform: translateY(8px);
+}
+
+.page-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity var(--transition-slow), transform var(--transition-slow);
+}
+
+.page-exit {
+    opacity: 1;
+}
+
+.page-exit-active {
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}

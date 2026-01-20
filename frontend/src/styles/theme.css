@@ -1,0 +1,123 @@
+/* ============================================
+   PRONUNEX THEME SYSTEM
+   Light/Dark theme switching architecture
+   ============================================ */
+
+/* ----------------------------------------
+   LIGHT THEME (Default)
+   Applied when no theme attribute or data-theme="light"
+   ---------------------------------------- */
+
+:root,
+[data-theme='light'] {
+    /* Backgrounds */
+    --bg-primary: #ffffff;
+    --bg-secondary: var(--color-neutral-50);
+    --bg-tertiary: var(--color-neutral-100);
+    --bg-inverse: var(--color-neutral-900);
+    --bg-overlay: rgba(0, 0, 0, 0.5);
+
+    /* Surfaces */
+    --surface-primary: #ffffff;
+    --surface-elevated: #ffffff;
+    --surface-hover: var(--color-neutral-50);
+    --surface-active: var(--color-neutral-100);
+
+    /* Text */
+    --text-primary: var(--color-neutral-900);
+    --text-secondary: var(--color-neutral-600);
+    --text-tertiary: var(--color-neutral-500);
+    --text-disabled: var(--color-neutral-400);
+    --text-inverse: #ffffff;
+    --text-link: var(--color-primary-600);
+    --text-link-hover: var(--color-primary-700);
+
+    /* Borders */
+    --border-primary: var(--color-neutral-200);
+    --border-secondary: var(--color-neutral-300);
+    --border-focus: var(--color-primary-500);
+
+    /* Shadows remain same for light */
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ----------------------------------------
+   DARK THEME
+   Applied when data-theme="dark"
+   Ready for future implementation
+   ---------------------------------------- */
+
+[data-theme='dark'] {
+    /* Backgrounds */
+    --bg-primary: var(--color-neutral-900);
+    --bg-secondary: var(--color-neutral-800);
+    --bg-tertiary: var(--color-neutral-700);
+    --bg-inverse: var(--color-neutral-50);
+    --bg-overlay: rgba(0, 0, 0, 0.7);
+
+    /* Surfaces */
+    --surface-primary: var(--color-neutral-800);
+    --surface-elevated: var(--color-neutral-700);
+    --surface-hover: var(--color-neutral-700);
+    --surface-active: var(--color-neutral-600);
+
+    /* Text */
+    --text-primary: var(--color-neutral-50);
+    --text-secondary: var(--color-neutral-300);
+    --text-tertiary: var(--color-neutral-400);
+    --text-disabled: var(--color-neutral-500);
+    --text-inverse: var(--color-neutral-900);
+    --text-link: var(--color-primary-400);
+    --text-link-hover: var(--color-primary-300);
+
+    /* Borders */
+    --border-primary: var(--color-neutral-700);
+    --border-secondary: var(--color-neutral-600);
+
+    /* Adjusted shadows for dark mode */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+}
+
+/* ----------------------------------------
+   SYSTEM PREFERENCE DETECTION
+   Auto-detect OS theme when no explicit theme set
+   Uncomment when ready to enable auto dark mode
+   ---------------------------------------- */
+
+/*
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    ... dark theme variables ...
+  }
+}
+*/
+
+/* ----------------------------------------
+   THEME TRANSITION
+   Smooth transition when switching themes
+   ---------------------------------------- */
+
+:root {
+    color-scheme: light;
+}
+
+[data-theme='dark'] {
+    color-scheme: dark;
+}
+
+/* Transition for theme switching */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+    transition:
+        background-color var(--transition-slow),
+        border-color var(--transition-slow),
+        color var(--transition-slow),
+        fill var(--transition-slow),
+        stroke var(--transition-slow) !important;
+}

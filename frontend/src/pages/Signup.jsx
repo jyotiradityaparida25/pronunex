@@ -1,0 +1,261 @@
+/**
+ * Signup Page
+ * User registration form
+ */
+
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, User, Eye, EyeOff, UserPlus } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useUI } from '../context/UIContext';
+import { Spinner } from '../components/Loader';
+import './Auth.css';
+
+export function Signup() {
+    const navigate = useNavigate();
+    const { signup } = useAuth();
+    const { toast } = useUI();
+
+    const [formData, setFormData] = useState({
+        username: '',
+        full_name: '',
+        email: '',
+        password: '',
+        password_confirm: '',
+    });
+    const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        if (errors[name]) {
+            setErrors((prev) => ({ ...prev, [name]: null }));
+        }
+    };
+
+    const validate = () => {
+        const newErrors = {};
+        if (!formData.username.trim()) {
+            newErrors.username = 'Username is required';
+        }
+        if (!formData.email) {
+            newErrors.email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = 'Invalid email format';
+        }
+        if (!formData.password) {
+            newErrors.password = 'Password is required';
+        } else if (formData.password.length < 8) {
+            newErrors.password = 'Password must be at least 8 characters';
+        }
+        if (formData.password !== formData.password_confirm) {
+            newErrors.password_confirm = 'Passwords do not match';
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!validate()) return;
+
+        setIsLoading(true);
+        try {
+            await signup({
+                username: formData.username,
+                full_name: formData.full_name,
+                email: formData.email,
+                password: formData.password,
+                password_confirm: formData.password_confirm,
+            });
+            toast.success('Account created successfully!');
+            navigate('/');
+        } catch (error) {
+            // Parse backend validation errors
+            const errorData = error.data || {};
+            const newErrors = {};
+
+            if (errorData.email) {
+                newErrors.email = Array.isArray(errorData.email) ? errorData.email[0] : errorData.email;
+            }
+            if (errorData.username) {
+                newErrors.username = Array.isArray(errorData.username) ? errorData.username[0] : errorData.username;
+            }
+            if (errorData.password) {
+                newErrors.password = Array.isArray(errorData.password) ? errorData.password[0] : errorData.password;
+            }
+            if (errorData.password_confirm) {
+                newErrors.password_confirm = Array.isArray(errorData.password_confirm) ? errorData.password_confirm[0] : errorData.password_confirm;
+            }
+
+            if (Object.keys(newErrors).length > 0) {
+                setErrors(newErrors);
+            } else {
+                toast.error(error.message || 'Registration failed. Please try again.');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="auth-page">
+            <div className="auth-container">
+                <div className="auth-header">
+                    <div className="auth-logo">
+                        <img src="/icon.png" alt="Pronunex" />
+                    </div>
+                    <h1 className="auth-title">Create Account</h1>
+                    <p className="auth-subtitle">Start improving your pronunciation today</p>
+                </div>
+
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label htmlFor="username" className="form-label">
+                                Username
+                            </label>
+                            <div className="input-wrapper">
+                                <User className="input-icon" size={18} />
+                                <input
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    className={`form-input ${errors.username ? 'form-input--error' : ''}`}
+                                    placeholder="johndoe"
+                                    value={formData.username}
+                                    onChange={handleChange}
+                                    disabled={isLoading}
+                                />
+                            </div>
+                            {errors.username && <span className="form-error">{errors.username}</span>}
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="full_name" className="form-label">
+                                Full Name
+                            </label>
+                            <div className="input-wrapper">
+                                <User className="input-icon" size={18} />
+                                <input
+                                    type="text"
+                                    id="full_name"
+                                    name="full_name"
+                                    className="form-input"
+                                    placeholder="John Doe"
+                                    value={formData.full_name}
+                                    onChange={handleChange}
+                                    disabled={isLoading}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="email" className="form-label">
+                            Email
+                        </label>
+                        <div className="input-wrapper">
+                            <Mail className="input-icon" size={18} />
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                className={`form-input ${errors.email ? 'form-input--error' : ''}`}
+                                placeholder="you@example.com"
+                                value={formData.email}
+                                onChange={handleChange}
+                                autoComplete="email"
+                                disabled={isLoading}
+                            />
+                        </div>
+                        {errors.email && <span className="form-error">{errors.email}</span>}
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="password" className="form-label">
+                            Password
+                        </label>
+                        <div className="input-wrapper">
+                            <Lock className="input-icon" size={18} />
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                id="password"
+                                name="password"
+                                className={`form-input ${errors.password ? 'form-input--error' : ''}`}
+                                placeholder="At least 8 characters"
+                                value={formData.password}
+                                onChange={handleChange}
+                                autoComplete="new-password"
+                                disabled={isLoading}
+                            />
+                            <button
+                                type="button"
+                                className="input-action"
+                                onClick={() => setShowPassword(!showPassword)}
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
+                        {errors.password && <span className="form-error">{errors.password}</span>}
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="password_confirm" className="form-label">
+                            Confirm Password
+                        </label>
+                        <div className="input-wrapper">
+                            <Lock className="input-icon" size={18} />
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                id="password_confirm"
+                                name="password_confirm"
+                                className={`form-input ${errors.password_confirm ? 'form-input--error' : ''}`}
+                                placeholder="Confirm your password"
+                                value={formData.password_confirm}
+                                onChange={handleChange}
+                                autoComplete="new-password"
+                                disabled={isLoading}
+                            />
+                        </div>
+                        {errors.password_confirm && (
+                            <span className="form-error">{errors.password_confirm}</span>
+                        )}
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="auth-submit btn btn--primary btn--lg w-full"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <>
+                                <Spinner size="sm" />
+                                <span>Creating account...</span>
+                            </>
+                        ) : (
+                            <>
+                                <UserPlus size={20} />
+                                <span>Create Account</span>
+                            </>
+                        )}
+                    </button>
+                </form>
+
+                <div className="auth-footer">
+                    <p>
+                        Already have an account?{' '}
+                        <Link to="/login" className="auth-link">
+                            Sign in
+                        </Link>
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default Signup;

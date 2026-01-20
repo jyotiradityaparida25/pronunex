@@ -1,0 +1,116 @@
+/* Progress Page Styles */
+
+.progress {
+    padding: var(--space-6) var(--space-4);
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .progress {
+        padding: var(--space-8);
+    }
+}
+
+.progress-loading,
+.progress-error,
+.progress-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: var(--space-4);
+    color: var(--text-secondary);
+}
+
+/* Header */
+.progress__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+}
+
+@media (min-width: 640px) {
+    .progress__header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.progress__title {
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+}
+
+.progress__trend {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+}
+
+.progress__trend--up {
+    background-color: var(--color-success-50);
+    color: var(--color-success-600);
+}
+
+.progress__trend--down {
+    background-color: var(--color-error-50);
+    color: var(--color-error-600);
+}
+
+.progress__trend--neutral {
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+/* Charts */
+.progress__charts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+}
+
+@media (min-width: 1024px) {
+    .progress__charts {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.progress__chart-card {
+    overflow: hidden;
+}
+
+.progress__chart-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+}
+
+.progress__chart-subtitle {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-4);
+}
+
+.progress__chart {
+    width: 100%;
+    min-height: 300px;
+}
+
+/* Recharts overrides */
+.recharts-cartesian-axis-tick-value {
+    fill: var(--text-tertiary);
+}
+
+.recharts-tooltip-wrapper {
+    filter: drop-shadow(var(--shadow-md));
+}
