@@ -143,13 +143,12 @@ python manage.py runserver
 Backend will be available at `http://localhost:8000`
 
 ## API Endpoints
-
 ### Authentication (`/api/v1/auth/`)
 
 - `POST /register/` - User registration
 - `POST /login/` - User login (returns JWT tokens)
 - `POST /logout/` - User logout
-- `POST /refresh/` - Refresh access token
+- `POST /token/refresh/` - Refresh access token
 - `GET /profile/` - Get user profile
 - `PUT /profile/` - Update user profile
 
