@@ -75,7 +75,7 @@ export function AuthProvider({ children }) {
      * Register new user
      */
     const signup = useCallback(async (userData) => {
-        const { data } = await api.post(ENDPOINTS.AUTH.SIGNUP, userData);
+        const { data } = await api.post(ENDPOINTS.AUTH.REGISTER, userData);
 
         // Backend returns { tokens: { access, refresh }, user: {...} }
         const tokens = data.tokens;

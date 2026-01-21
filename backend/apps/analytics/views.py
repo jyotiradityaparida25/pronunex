@@ -205,6 +205,42 @@ class HistoryView(generics.ListAPIView):
         ).order_by('-date')
 
 
+class WeakPhonemesView(APIView):
+    """
+    GET /api/v1/analytics/weak-phonemes/
+    
+    Get list of user's current weak phonemes.
+    """
+    
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        from django.conf import settings
+        threshold = settings.SCORING_CONFIG.get('WEAK_PHONEME_THRESHOLD', 0.7)
+        
+        phoneme_progress = PhonemeProgress.objects.filter(
+            user=user,
+            current_score__lt=threshold
+        ).select_related('phoneme').order_by('current_score')
+        
+        weak_phonemes = [
+            {
+                'phoneme': pp.phoneme.arpabet,
+                'symbol': pp.phoneme.symbol,
+                'score': round(pp.current_score, 2),
+                'attempts': pp.attempts_count,
+            }
+            for pp in phoneme_progress
+        ]
+        
+        return Response({
+            'weak_phonemes': weak_phonemes,
+            'threshold': threshold,
+            'count': len(weak_phonemes),
+        })
+
+
 def update_user_analytics(user, attempt):
     """
     Update analytics after a new attempt.

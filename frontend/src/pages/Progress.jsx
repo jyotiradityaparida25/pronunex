@@ -28,7 +28,7 @@ export function Progress() {
     const { data: history, isLoading: historyLoading, error: historyError, refetch: refetchHistory } =
         useApi(ENDPOINTS.ANALYTICS.HISTORY);
     const { data: phonemes, isLoading: phonemesLoading, error: phonemesError, refetch: refetchPhonemes } =
-        useApi(ENDPOINTS.ANALYTICS.PHONEMES);
+        useApi(ENDPOINTS.ANALYTICS.PHONEME_STATS);
 
     const isLoading = historyLoading || phonemesLoading;
     const error = historyError || phonemesError;

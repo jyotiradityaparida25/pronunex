@@ -10,7 +10,7 @@ export const ENDPOINTS = {
     // Authentication
     AUTH: {
         LOGIN: `${BASE_PATH}/auth/login/`,
-        SIGNUP: `${BASE_PATH}/auth/signup/`,
+        REGISTER: `${BASE_PATH}/auth/register/`,
         LOGOUT: `${BASE_PATH}/auth/logout/`,
         REFRESH: `${BASE_PATH}/auth/token/refresh/`,
         PROFILE: `${BASE_PATH}/auth/profile/`,
@@ -21,34 +21,35 @@ export const ENDPOINTS = {
 
     // Library
     PHONEMES: {
-        LIST: `${BASE_PATH}/phonemes/`,
-        DETAIL: (id) => `${BASE_PATH}/phonemes/${id}/`,
+        LIST: `${BASE_PATH}/library/phonemes/`,
+        DETAIL: (id) => `${BASE_PATH}/library/phonemes/${id}/`,
     },
     SENTENCES: {
-        LIST: `${BASE_PATH}/sentences/`,
-        DETAIL: (id) => `${BASE_PATH}/sentences/${id}/`,
-        AUDIO: (id) => `${BASE_PATH}/sentences/${id}/audio/`,
-        RECOMMEND: `${BASE_PATH}/sentences/recommend/`,
-        PREGENERATE: `${BASE_PATH}/sentences/pregenerate/`,
+        LIST: `${BASE_PATH}/library/sentences/`,
+        DETAIL: (id) => `${BASE_PATH}/library/sentences/${id}/`,
+        AUDIO: (id) => `${BASE_PATH}/library/sentences/${id}/audio/`,
+        RECOMMEND: `${BASE_PATH}/library/sentences/recommend/`,
+        PREGENERATE: `${BASE_PATH}/library/sentences/pregenerate/`,
     },
 
     // Practice
     SESSIONS: {
-        LIST: `${BASE_PATH}/sessions/`,
-        CREATE: `${BASE_PATH}/sessions/`,
-        DETAIL: (id) => `${BASE_PATH}/sessions/${id}/`,
-        END: (id) => `${BASE_PATH}/sessions/${id}/end/`,
+        LIST: `${BASE_PATH}/practice/sessions/`,
+        CREATE: `${BASE_PATH}/practice/sessions/`,
+        DETAIL: (id) => `${BASE_PATH}/practice/sessions/${id}/`,
+        END: (id) => `${BASE_PATH}/practice/sessions/${id}/end/`,
     },
     ATTEMPTS: {
-        LIST: `${BASE_PATH}/attempts/`,
-        DETAIL: (id) => `${BASE_PATH}/attempts/${id}/`,
+        LIST: `${BASE_PATH}/practice/attempts/`,
+        DETAIL: (id) => `${BASE_PATH}/practice/attempts/${id}/`,
     },
-    ASSESS: `${BASE_PATH}/assess/`,
+    ASSESS: `${BASE_PATH}/practice/assess/`,
 
     // Analytics
     ANALYTICS: {
         PROGRESS: `${BASE_PATH}/analytics/progress/`,
-        PHONEMES: `${BASE_PATH}/analytics/phonemes/`,
+        PHONEME_STATS: `${BASE_PATH}/analytics/phoneme-stats/`,
+        WEAK_PHONEMES: `${BASE_PATH}/analytics/weak-phonemes/`,
         HISTORY: `${BASE_PATH}/analytics/history/`,
     },
 };
