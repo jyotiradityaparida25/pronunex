@@ -121,6 +121,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # REST Framework Configuration
+# Authentication Strategy:
+# | Auth Type      | CSRF Required |
+# |----------------|---------------|
+# | JWT in headers | No (stateless)|
+# | Session auth   | Yes           |
+#
+# This API uses JWT exclusively for API endpoints.
+# CSRF is only enforced for Django admin (session-based).
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -128,6 +136,17 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/hour',
+        'user': '1000/hour',
+        'login': '5/minute',
+        'password_reset': '3/hour',
+        'signup': '10/hour',
+    },
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_RENDERER_CLASSES': [
@@ -146,6 +165,18 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
 }
+
+# Authentication Configuration (centralized)
+AUTH_CONFIG = {
+    'PASSWORD_RESET_TOKEN_EXPIRY_HOURS': 24,
+    'EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS': 48,
+}
+
+# Cookie Security (session-based for admin only)
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = not DEBUG
 
 # CORS Configuration
 CORS_ALLOW_ALL_ORIGINS = DEBUG

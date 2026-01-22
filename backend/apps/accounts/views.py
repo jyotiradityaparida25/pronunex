@@ -1,18 +1,20 @@
 """
 API Views for authentication and user management.
+
+Security features:
+- Rate limiting via custom throttle classes
+- Logic delegated to services layer
+- No sensitive data logged
 """
 
 from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
-from django.utils import timezone
-from datetime import timedelta
 import logging
 
-from .models import User, PasswordResetToken
+from .models import User
 from .serializers import (
     SignupSerializer,
     LoginSerializer,
@@ -21,6 +23,12 @@ from .serializers import (
     PasswordResetConfirmSerializer,
     ChangePasswordSerializer,
 )
+from .throttling import (
+    LoginRateThrottle,
+    PasswordResetRateThrottle,
+    SignupRateThrottle,
+)
+from .services import AuthenticationService, PasswordResetService, SupabaseEmailService
 
 logger = logging.getLogger(__name__)
 
@@ -30,11 +38,13 @@ class SignupView(generics.CreateAPIView):
     POST /api/v1/auth/signup/
     
     Register a new user account.
+    Rate limited to prevent mass account creation.
     """
     
     queryset = User.objects.all()
     serializer_class = SignupSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [SignupRateThrottle]
     
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -42,17 +52,15 @@ class SignupView(generics.CreateAPIView):
         user = serializer.save()
         
         # Generate tokens for immediate login
-        refresh = RefreshToken.for_user(user)
+        auth_service = AuthenticationService()
+        tokens = auth_service.generate_tokens(user)
         
-        logger.info(f"New user registered: {user.email}")
+        logger.info("New user registered")
         
         return Response({
             'message': 'Registration successful.',
             'user': UserProfileSerializer(user).data,
-            'tokens': {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }
+            'tokens': tokens
         }, status=status.HTTP_201_CREATED)
 
 
@@ -61,18 +69,22 @@ class LoginView(APIView):
     POST /api/v1/auth/login/
     
     Authenticate user and return JWT tokens.
+    Rate limited to prevent brute-force attacks.
     """
     
     permission_classes = [AllowAny]
+    throttle_classes = [LoginRateThrottle]
     
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
         user = serializer.validated_data['user']
-        tokens = serializer.get_tokens(user)
         
-        logger.info(f"User logged in: {user.email}")
+        auth_service = AuthenticationService()
+        tokens = auth_service.generate_tokens(user)
+        
+        logger.info("User logged in")
         
         return Response({
             'message': 'Login successful.',
@@ -92,27 +104,12 @@ class LogoutView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
-        try:
-            refresh_token = request.data.get('refresh')
-            if refresh_token:
-                token = RefreshToken(refresh_token)
-                token.blacklist()
-            
-            if hasattr(request, 'user') and request.user.is_authenticated:
-                logger.info(f"User logged out: {request.user.email}")
-            else:
-                logger.info("Logout request processed (no authenticated user)")
-            
-            return Response({
-                'message': 'Logout successful.'
-            }, status=status.HTTP_200_OK)
-            
-        except Exception as e:
-            logger.error(f"Logout error: {str(e)}")
-            # Still return success - client should clear tokens regardless
-            return Response({
-                'message': 'Logout processed.'
-            }, status=status.HTTP_200_OK)
+        refresh_token = request.data.get('refresh')
+        
+        auth_service = AuthenticationService()
+        success, message = auth_service.logout(refresh_token)
+        
+        return Response({'message': message}, status=status.HTTP_200_OK)
 
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
@@ -135,9 +132,11 @@ class PasswordResetRequestView(APIView):
     POST /api/v1/auth/password/reset/
     
     Request a password reset email.
+    Rate limited to prevent email spam.
     """
     
     permission_classes = [AllowAny]
+    throttle_classes = [PasswordResetRateThrottle]
     
     def post(self, request):
         serializer = PasswordResetRequestSerializer(data=request.data)
@@ -145,27 +144,16 @@ class PasswordResetRequestView(APIView):
         
         email = serializer.validated_data['email']
         
-        try:
-            user = User.objects.get(email=email)
-            
-            # Generate reset token
-            token = PasswordResetToken.generate_token()
-            expires_at = timezone.now() + timedelta(hours=24)
-            
-            PasswordResetToken.objects.create(
-                user=user,
-                token=token,
-                expires_at=expires_at
-            )
-            
-            # TODO: Send email with reset link
-            # For now, log the token (development only)
-            logger.info(f"Password reset token for {email}: {token}")
-            
-        except User.DoesNotExist:
-            # Do not reveal if email exists
-            pass
+        # Use service for token creation
+        reset_service = PasswordResetService()
+        success, raw_token = reset_service.request_reset(email)
         
+        # Send email if token was created
+        if raw_token:
+            email_service = SupabaseEmailService()
+            email_service.send_password_reset_email(email, raw_token)
+        
+        # Always return same response (no user enumeration)
         return Response({
             'message': 'If the email exists, a reset link has been sent.'
         }, status=status.HTTP_200_OK)
@@ -184,23 +172,17 @@ class PasswordResetConfirmView(APIView):
         serializer = PasswordResetConfirmSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
-        reset_token = serializer.validated_data['reset_token']
+        raw_token = serializer.validated_data['token']
         new_password = serializer.validated_data['new_password']
         
-        # Update password
-        user = reset_token.user
-        user.set_password(new_password)
-        user.save()
+        # Use service for password reset
+        reset_service = PasswordResetService()
+        success, message = reset_service.reset_password(raw_token, new_password)
         
-        # Mark token as used
-        reset_token.is_used = True
-        reset_token.save()
+        if not success:
+            return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
         
-        logger.info(f"Password reset completed for: {user.email}")
-        
-        return Response({
-            'message': 'Password has been reset successfully.'
-        }, status=status.HTTP_200_OK)
+        return Response({'message': message}, status=status.HTTP_200_OK)
 
 
 class ChangePasswordView(APIView):
@@ -228,7 +210,7 @@ class ChangePasswordView(APIView):
         user.set_password(new_password)
         user.save()
         
-        logger.info(f"Password changed for: {user.email}")
+        logger.info("Password changed for user")
         
         return Response({
             'message': 'Password changed successfully.'

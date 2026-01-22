@@ -48,7 +48,9 @@ class User(AbstractUser):
 class PasswordResetToken(models.Model):
     """
     Token model for password reset functionality.
-    Tokens expire after a configurable duration.
+    
+    Security: Tokens are stored as SHA-256 hashes.
+    Raw tokens are returned only at creation time (to send via email).
     """
     
     user = models.ForeignKey(
@@ -56,7 +58,11 @@ class PasswordResetToken(models.Model):
         on_delete=models.CASCADE, 
         related_name='reset_tokens'
     )
-    token = models.CharField(max_length=64, unique=True)
+    token_hash = models.CharField(
+        max_length=64, 
+        unique=True,
+        help_text='SHA-256 hash of the reset token'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
     is_used = models.BooleanField(default=False)
@@ -70,6 +76,52 @@ class PasswordResetToken(models.Model):
         return f"Reset token for {self.user.email}"
     
     @classmethod
-    def generate_token(cls):
-        """Generate a cryptographically secure token."""
+    def generate_raw_token(cls):
+        """Generate a cryptographically secure raw token."""
         return secrets.token_urlsafe(48)
+    
+    @classmethod
+    def hash_token(cls, raw_token: str) -> str:
+        """Hash a raw token using SHA-256."""
+        import hashlib
+        return hashlib.sha256(raw_token.encode()).hexdigest()
+    
+    @classmethod
+    def create_token(cls, user, expires_at):
+        """
+        Create a new password reset token.
+        
+        Args:
+            user: User instance
+            expires_at: Expiration datetime
+            
+        Returns:
+            The raw token (to send via email). Hash is stored in DB.
+        """
+        raw_token = cls.generate_raw_token()
+        token_hash = cls.hash_token(raw_token)
+        
+        cls.objects.create(
+            user=user,
+            token_hash=token_hash,
+            expires_at=expires_at
+        )
+        
+        return raw_token
+    
+    @classmethod
+    def validate_token(cls, raw_token: str):
+        """
+        Validate a raw token by comparing its hash.
+        
+        Args:
+            raw_token: The raw token from the reset link
+            
+        Returns:
+            PasswordResetToken instance if valid and unused, None otherwise
+        """
+        token_hash = cls.hash_token(raw_token)
+        try:
+            return cls.objects.get(token_hash=token_hash, is_used=False)
+        except cls.DoesNotExist:
+            return None

@@ -137,24 +137,8 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
                 'new_password_confirm': 'Passwords do not match.'
             })
         
-        token = attrs.get('token')
-        try:
-            reset_token = PasswordResetToken.objects.get(
-                token=token, 
-                is_used=False
-            )
-        except PasswordResetToken.DoesNotExist:
-            raise serializers.ValidationError({
-                'token': 'Invalid or expired token.'
-            })
-        
-        from django.utils import timezone
-        if reset_token.expires_at < timezone.now():
-            raise serializers.ValidationError({
-                'token': 'Token has expired.'
-            })
-        
-        attrs['reset_token'] = reset_token
+        # Token validation is now handled by the service layer
+        # Serializer only validates password matching
         return attrs
 
 

@@ -25,7 +25,12 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(PasswordResetToken)
 class PasswordResetTokenAdmin(admin.ModelAdmin):
+    """
+    Admin for password reset tokens.
+    Token hash is intentionally not displayed (principle of least privilege).
+    """
     list_display = ['user', 'created_at', 'expires_at', 'is_used']
-    list_filter = ['is_used']
+    list_filter = ['is_used', 'created_at']
     search_fields = ['user__email']
-    readonly_fields = ['token', 'created_at']
+    ordering = ['-created_at']
+    # No token_hash field exposed - admins do not need access to reset tokens
