@@ -187,6 +187,11 @@ class AssessmentView(APIView):
         # Save phoneme errors
         self._save_phoneme_errors(attempt, result.get('phoneme_scores', []))
         
+        # Update analytics (UserProgress, PhonemeProgress, StreakRecord) in real-time
+        from apps.analytics.services import AnalyticsService
+        analytics_service = AnalyticsService()
+        analytics_service.update_after_attempt(request.user, attempt)
+        
         logger.info(f"Assessment completed for user {request.user.email}: score {result['overall_score']}")
         
         response_data = {
