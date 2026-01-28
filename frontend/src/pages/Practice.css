@@ -557,6 +557,74 @@
     color: var(--color-warning-600);
 }
 
+/* Score Icon with hover tooltip */
+.practice__score-icon {
+    cursor: pointer;
+    transition: transform var(--transition-fast), filter var(--transition-fast);
+}
+
+.practice__score-icon:hover {
+    transform: scale(1.15);
+    filter: brightness(1.1);
+}
+
+/* Tooltip on score label hover */
+.practice__score-label {
+    position: relative;
+    cursor: pointer;
+}
+
+.practice__score-label[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%) translateY(-8px);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface-elevated);
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-weight: var(--font-normal);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    white-space: nowrap;
+    max-width: 280px;
+    white-space: normal;
+    text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-fast), visibility var(--transition-fast), transform var(--transition-fast);
+    z-index: 100;
+    pointer-events: none;
+    border: 1px solid var(--border-primary);
+}
+
+.practice__score-label[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-12px);
+}
+
+/* Tooltip arrow */
+.practice__score-label[data-tooltip]::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%) translateY(4px);
+    border: 6px solid transparent;
+    border-top-color: var(--surface-elevated);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+    z-index: 101;
+}
+
+.practice__score-label[data-tooltip]:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
 /* Word Heatmap */
 .practice__word-heatmap {
     display: flex;

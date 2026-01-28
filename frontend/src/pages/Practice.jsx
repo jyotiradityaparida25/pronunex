@@ -789,15 +789,20 @@ export function Practice() {
                             <div className="practice__score-display">
                                 <ScoreRing score={assessment.overall_score} />
                                 <div className="practice__score-info">
-                                    <div className={`practice__score-label ${assessment.overall_score >= 0.7 ? 'practice__score-label--good' : 'practice__score-label--needs-work'}`}>
+                                    <div
+                                        className={`practice__score-label ${assessment.overall_score >= 0.7 ? 'practice__score-label--good' : 'practice__score-label--needs-work'}`}
+                                        data-tooltip={assessment.overall_score >= 0.7
+                                            ? 'Excellent pronunciation! You can move to harder sentences.'
+                                            : `Score ${Math.round(assessment.overall_score * 100)}% - Try focusing on the highlighted phonemes below.`}
+                                    >
                                         {assessment.overall_score >= 0.7 ? (
                                             <>
-                                                <CheckCircle size={24} />
+                                                <CheckCircle size={24} className="practice__score-icon" />
                                                 <span>Great job!</span>
                                             </>
                                         ) : (
                                             <>
-                                                <AlertCircle size={24} />
+                                                <AlertCircle size={24} className="practice__score-icon" />
                                                 <span>Keep practicing</span>
                                             </>
                                         )}
