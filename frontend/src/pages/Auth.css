@@ -182,3 +182,46 @@
     color: var(--text-link-hover);
     text-decoration: underline;
 }
+
+/* Back Navigation Button */
+.auth-back-btn {
+    position: absolute;
+    top: var(--space-4);
+    left: var(--space-4);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--text-secondary);
+    background-color: transparent;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.auth-back-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    border-color: var(--border-secondary);
+}
+
+/* Clickable Logo Link */
+.auth-logo-link {
+    display: inline-block;
+    text-decoration: none;
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.auth-logo-link:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+/* Adjust container for absolute positioning */
+.auth-container {
+    position: relative;
+    padding-top: calc(var(--space-8) + var(--space-6));
+}
