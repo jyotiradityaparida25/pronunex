@@ -87,11 +87,15 @@ if USE_SUPABASE and DATABASE_URL:
         'default': dj_database_url.parse(DATABASE_URL)
     }
 else:
-    # Use local SQLite
+    # Use local SQLite with improved concurrency settings
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
+            'OPTIONS': {
+                'timeout': 30,  # Increase timeout to 30 seconds
+                'init_command': 'PRAGMA journal_mode=WAL;',  # Enable WAL mode for better concurrency
+            }
         }
     }
 
