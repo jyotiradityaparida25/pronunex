@@ -1,6 +1,6 @@
 /**
  * Dashboard Page - Three-Column Grid Layout
- * Full viewport adaptive with profile, stats, charts, and activity heatmap
+ * Full viewport adaptive with profile, stats, and charts
  */
 
 import { useState, useEffect, useRef } from 'react';
@@ -309,63 +309,7 @@ function WeeklyChart({ data = [] }) {
     );
 }
 
-// Activity Heatmap Component
-function ActivityHeatmap({ data = {} }) {
-    // Generate last 12 weeks of data
-    const generateHeatmapData = () => {
-        const weeks = [];
-        const today = new Date();
 
-        for (let w = 11; w >= 0; w--) {
-            const week = [];
-            for (let d = 0; d < 7; d++) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - (w * 7 + (6 - d)));
-                const dateStr = date.toISOString().split('T')[0];
-                const level = data[dateStr] || Math.floor(Math.random() * 5);
-                week.push({ date: dateStr, level });
-            }
-            weeks.push(week);
-        }
-        return weeks;
-    };
-
-    const heatmapData = generateHeatmapData();
-
-    return (
-        <div className="dashboard__heatmap-section">
-            <div className="dashboard__heatmap-card">
-                <div className="dashboard__heatmap-header">
-                    <h3 className="dashboard__heatmap-title">Practice Activity</h3>
-                    <div className="dashboard__heatmap-legend">
-                        <span className="dashboard__heatmap-legend-label">Less</span>
-                        <div className="dashboard__heatmap-legend-boxes">
-                            <div className="dashboard__heatmap-legend-box dashboard__heatmap-legend-box--0" />
-                            <div className="dashboard__heatmap-legend-box dashboard__heatmap-legend-box--1" />
-                            <div className="dashboard__heatmap-legend-box dashboard__heatmap-legend-box--2" />
-                            <div className="dashboard__heatmap-legend-box dashboard__heatmap-legend-box--3" />
-                            <div className="dashboard__heatmap-legend-box dashboard__heatmap-legend-box--4" />
-                        </div>
-                        <span>More</span>
-                    </div>
-                </div>
-                <div className="dashboard__heatmap-grid">
-                    {heatmapData.map((week, weekIndex) => (
-                        <div key={weekIndex} className="dashboard__heatmap-week">
-                            {week.map((day, dayIndex) => (
-                                <div
-                                    key={dayIndex}
-                                    className={`dashboard__heatmap-day dashboard__heatmap-day--level-${day.level}`}
-                                    title={`${day.date}: ${day.level} sessions`}
-                                />
-                            ))}
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
-}
 
 export function Dashboard() {
     const { user } = useAuth();
@@ -621,8 +565,7 @@ export function Dashboard() {
                     </div>
                 </aside>
 
-                {/* Activity Heatmap - Full Width */}
-                <ActivityHeatmap />
+
             </div>
         </div>
     );
