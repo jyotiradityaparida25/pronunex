@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, Eye, EyeOff, UserPlus } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, UserPlus, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { Spinner } from '../components/Loader';
@@ -103,10 +103,17 @@ export function Signup() {
     return (
         <div className="auth-page">
             <div className="auth-container">
+                <Link to="/" className="auth-back-btn">
+                    <ArrowLeft size={18} />
+                    <span>Back</span>
+                </Link>
+
                 <div className="auth-header">
-                    <div className="auth-logo">
-                        <img src="/icon.png" alt="Pronunex" />
-                    </div>
+                    <Link to="/" className="auth-logo-link">
+                        <div className="auth-logo">
+                            <img src="/icon.png" alt="Pronunex" />
+                        </div>
+                    </Link>
                     <h1 className="auth-title">Create Account</h1>
                     <p className="auth-subtitle">Start improving your pronunciation today</p>
                 </div>

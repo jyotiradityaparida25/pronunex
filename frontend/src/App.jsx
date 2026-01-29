@@ -13,6 +13,8 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 // Eager loaded pages
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import Phonemes from './pages/Phonemes';
 import Profile from './pages/Profile';
@@ -58,6 +60,7 @@ function App() {
         <ErrorBoundary>
             <ToastContainer />
             <Routes>
+<<<<<<< HEAD
                 {/* Auth Routes */}
                 <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
                 <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
@@ -73,6 +76,41 @@ function App() {
                                 </MainLayout>
                             </Suspense>
                         </PublicRoute>
+=======
+                {/* Public routes */}
+                <Route
+                    path="/login"
+                    element={
+                        <PublicRoute>
+                            <Login />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/signup"
+                    element={
+                        <PublicRoute>
+                            <Signup />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/forgot-password"
+                    element={<ForgotPassword />}
+                />
+                <Route
+                    path="/reset-password"
+                    element={<ResetPassword />}
+                />
+
+                {/* Landing page accessible to all users */}
+                <Route
+                    path="/"
+                    element={
+                        <Suspense fallback={<LoadingOverlay message="Loading..." />}>
+                            <LandingPage />
+                        </Suspense>
+>>>>>>> ba9fcc0ca181ceb55aff5404450842872885f5f9
                     }
                 />
 
