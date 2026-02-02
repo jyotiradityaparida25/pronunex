@@ -3,7 +3,7 @@
  * Full-width with streak counter, notifications, and enhanced active states
  */
 
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
     Home,
     Mic,
@@ -19,7 +19,7 @@ import {
     ChevronDown,
     Settings
 } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useApi } from '../hooks/useApi';
 import { ENDPOINTS } from '../api/endpoints';
@@ -35,16 +35,38 @@ const NAV_ITEMS = [
 export function Navbar() {
     const { user, isAuthenticated, logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const dropdownRef = useRef(null);
 
-    // Fetch user progress for streak
-    const { data: progress } = useApi(
-        isAuthenticated ? ENDPOINTS.ANALYTICS.PROGRESS : null
+    // Fetch user progress for streak - refetch when location changes
+    const { data: progress, refetch: refetchProgress } = useApi(
+        isAuthenticated ? ENDPOINTS.ANALYTICS.PROGRESS : null,
+        { deps: [location.pathname] }
     );
 
-    const streakDays = progress?.streak?.current_streak ?? progress?.streak_days ?? 0;
+    // Extract streak - handle multiple possible structures from API
+    const streakDays = useMemo(() => {
+        if (!progress) return 0;
+
+        // Try progress.streak.current_streak (serialized StreakRecord)
+        if (progress.streak?.current_streak !== undefined) {
+            return progress.streak.current_streak;
+        }
+
+        // Try progress.streak directly if it's a number
+        if (typeof progress.streak === 'number') {
+            return progress.streak;
+        }
+
+        // Fallback to streak_days field
+        if (progress.streak_days !== undefined) {
+            return progress.streak_days;
+        }
+
+        return 0;
+    }, [progress]);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -80,7 +102,7 @@ export function Navbar() {
             <div className="navbar__container">
                 {/* Left Section - Branding */}
                 <div className="navbar__brand">
-                    <NavLink to={isAuthenticated ? "/dashboard" : "/"} className="navbar__logo" onClick={closeMobileMenu}>
+                    <NavLink to="/" className="navbar__logo" onClick={closeMobileMenu}>
                         <img
                             src="/icon.png"
                             alt="Pronunex"
@@ -164,14 +186,14 @@ export function Navbar() {
                                             <span>My Profile</span>
                                         </NavLink>
 
-                                        <button
-                                            type="button"
+                                        <NavLink
+                                            to="/settings"
                                             className="navbar__dropdown-item"
                                             onClick={() => setIsUserMenuOpen(false)}
                                         >
                                             <Settings size={16} />
                                             <span>Settings</span>
-                                        </button>
+                                        </NavLink>
 
                                         {user?.is_staff && (
                                             <NavLink

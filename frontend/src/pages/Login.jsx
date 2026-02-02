@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, LogIn, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { Spinner } from '../components/Loader';
@@ -70,10 +70,17 @@ export function Login() {
     return (
         <div className="auth-page">
             <div className="auth-container">
+                <Link to="/" className="auth-back-btn">
+                    <ArrowLeft size={18} />
+                    <span>Back</span>
+                </Link>
+
                 <div className="auth-header">
-                    <div className="auth-logo">
-                        <img src="/icon.png" alt="Pronunex" />
-                    </div>
+                    <Link to="/" className="auth-logo-link">
+                        <div className="auth-logo">
+                            <img src="/icon.png" alt="Pronunex" />
+                        </div>
+                    </Link>
                     <h1 className="auth-title">Welcome Back</h1>
                     <p className="auth-subtitle">Sign in to continue your practice</p>
                 </div>
@@ -135,6 +142,12 @@ export function Login() {
                         {errors.password && <span className="form-error">{errors.password}</span>}
                     </div>
 
+                    <div className="form-options">
+                        <Link to="/forgot-password" className="auth-link auth-link--sm">
+                            Forgot Password?
+                        </Link>
+                    </div>
+
                     <button
                         type="submit"
                         className="auth-submit btn btn--primary btn--lg w-full"
@@ -163,7 +176,7 @@ export function Login() {
                     </p>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 

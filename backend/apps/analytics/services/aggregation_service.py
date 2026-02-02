@@ -97,9 +97,36 @@ class AggregationService:
         # Get or create streak
         streak, _ = StreakRecord.objects.get_or_create(user=self.user)
         
+        # Calculate weekly scores (last 7 days)
+        # We need strict last 7 days filling gaps with 0
+        weekly_scores = []
+        weekly_labels = []
+        
+        # Create a lookup dict for recent progress
+        progress_map = {p.date: p for p in recent_progress}
+        
+        for i in range(6, -1, -1):
+            day = end_date - timedelta(days=i)
+            day_progress = progress_map.get(day)
+            
+            score = 0
+            if day_progress and day_progress.average_score:
+                # Convert 0.0-1.0 to 0-100 range for visualization
+                score = round(day_progress.average_score * 100, 1)
+            
+            weekly_scores.append(score)
+            weekly_labels.append(day.strftime("%a"))
+
         # Calculate total practice minutes
         total_minutes = sum(p.total_practice_minutes for p in recent_progress)
         
+        # Calculate Daily Goal Progress (Goal: 10 sentences/attempts)
+        today = timezone.now().date()
+        today_progress = progress_map.get(today)
+        sentences_today = today_progress.attempts_count if today_progress else 0
+        daily_goal_sentences = 10
+        daily_goal_progress = min(int((sentences_today / daily_goal_sentences) * 100), 100)
+
         return {
             'session_stats': session_stats,
             'attempt_stats': attempt_stats,
@@ -109,7 +136,10 @@ class AggregationService:
             'strong_phonemes': strong_phonemes[:10],
             'score_trend': score_trend,
             'streak': streak,
+            'weekly_scores': weekly_scores,
+            'weekly_labels': weekly_labels,
             'total_practice_minutes': round(total_minutes, 1),
+            'daily_goal_progress': daily_goal_progress,
         }
     
     def _calculate_score_trend(self, recent_progress):

@@ -68,6 +68,25 @@ class AnalyticsService:
         
         progress.average_score = today_stats.get('avg', 0)
         progress.best_score = today_stats.get('best', 0)
+        
+        # Calculate sessions count and total practice minutes
+        from apps.practice.models import UserSession
+        
+        sessions_today = UserSession.objects.filter(
+            user=user,
+            started_at__date=today
+        )
+        
+        progress.sessions_count = sessions_today.count()
+        
+        # Calculate total practice minutes from sessions with end times
+        total_minutes = 0
+        for session in sessions_today:
+            if session.ended_at and session.started_at:
+                delta = session.ended_at - session.started_at
+                total_minutes += delta.total_seconds() / 60
+        
+        progress.total_practice_minutes = round(total_minutes, 1)
         progress.save()
     
     def _update_phoneme_progress(self, user, attempt):

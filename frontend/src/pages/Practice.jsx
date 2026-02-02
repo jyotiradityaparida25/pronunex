@@ -1,6 +1,7 @@
 /**
- * Practice Page - Two-Column Split Layout
- * Premium EdTech design with waveform visualization and word heatmap
+ * Practice Page - Enterprise Bento Grid Layout
+ * Premium EdTech design with difficulty tiering, waveform visualization, 
+ * metric cards, and adaptive recommendations
  */
 
 import { useState, useEffect, useRef } from 'react';
@@ -16,7 +17,12 @@ import {
     Pause,
     RotateCcw,
     Send,
-    Volume2
+    Volume2,
+    Target,
+    Gauge,
+    BarChart3,
+    Check,
+    X
 } from 'lucide-react';
 import { useApi, useMutation } from '../hooks/useApi';
 import { useUI } from '../context/UIContext';
@@ -25,6 +31,10 @@ import { ENDPOINTS } from '../api/endpoints';
 import { Spinner } from '../components/Loader';
 import { ErrorState } from '../components/ErrorState';
 import { EmptyState } from '../components/EmptyState';
+import { DifficultyBadge, MetricCard, RecommendationCard, ConfidenceMeter } from '../components/practice';
+import { InsightsPanel } from '../components/practice/insights/InsightsPanel';
+import { ComparisonVisualizer } from '../components/practice/insights/ComparisonVisualizer';
+import { AIRecommendations } from '../components/practice/insights/AIRecommendations';
 import './Practice.css';
 
 // Waveform Visualizer Component
@@ -107,7 +117,7 @@ function WaveformVisualizer({ isRecording, audioStream }) {
     );
 }
 
-// Word Heatmap Component
+// Word Heatmap Component - With accessibility icons
 function WordHeatmap({ sentence, phonemeScores }) {
     const words = sentence.split(/\s+/);
 
@@ -121,22 +131,25 @@ function WordHeatmap({ sentence, phonemeScores }) {
         return Math.max(0, Math.min(1, avgScore + variance));
     };
 
-    const getWordClass = (score) => {
-        if (score >= 0.8) return 'practice__heatmap-word--correct';
-        if (score >= 0.6) return 'practice__heatmap-word--needs-work';
-        return 'practice__heatmap-word--incorrect';
+    const getWordData = (score) => {
+        if (score >= 0.8) return { class: 'practice__heatmap-word--correct', icon: Check, label: 'Correct' };
+        if (score >= 0.6) return { class: 'practice__heatmap-word--needs-work', icon: AlertCircle, label: 'Close' };
+        return { class: 'practice__heatmap-word--incorrect', icon: X, label: 'Needs work' };
     };
 
     return (
         <div className="practice__word-heatmap">
             {words.map((word, idx) => {
                 const score = getWordScore(idx);
+                const wordData = getWordData(score);
+                const IconComponent = wordData.icon;
                 return (
                     <span
                         key={idx}
-                        className={`practice__heatmap-word ${getWordClass(score)}`}
-                        title={`Score: ${Math.round(score * 100)}%`}
+                        className={`practice__heatmap-word ${wordData.class}`}
+                        title={`${wordData.label}: ${Math.round(score * 100)}%`}
                     >
+                        <IconComponent size={14} className="practice__heatmap-icon" />
                         {word}
                     </span>
                 );
@@ -181,11 +194,38 @@ export function Practice() {
     const sentences = sentencesData?.recommendations || (Array.isArray(sentencesData) ? sentencesData : []);
     const { mutate, isLoading: isAssessing } = useMutation();
 
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [assessment, setAssessment] = useState(null);
-    const [sessionId, setSessionId] = useState(null);
+    // Session storage keys for state persistence
+    const STORAGE_KEYS = {
+        currentIndex: 'practice_currentIndex',
+        sessionId: 'practice_sessionId',
+        assessment: 'practice_assessment',
+    };
 
-    // Recording state
+    // Load persisted state from sessionStorage
+    const getPersistedState = (key, defaultValue) => {
+        try {
+            const stored = sessionStorage.getItem(key);
+            if (stored !== null) {
+                return JSON.parse(stored);
+            }
+        } catch (e) {
+            console.warn(`Failed to load ${key} from storage:`, e);
+        }
+        return defaultValue;
+    };
+
+    // Initialize state with persisted values
+    const [currentIndex, setCurrentIndex] = useState(() =>
+        getPersistedState(STORAGE_KEYS.currentIndex, 0)
+    );
+    const [assessment, setAssessment] = useState(() =>
+        getPersistedState(STORAGE_KEYS.assessment, null)
+    );
+    const [sessionId, setSessionId] = useState(() =>
+        getPersistedState(STORAGE_KEYS.sessionId, null)
+    );
+
+    // Recording state (not persisted - audio blobs can't be stored)
     const [isRecording, setIsRecording] = useState(false);
     const [hasRecording, setHasRecording] = useState(false);
     const [audioBlob, setAudioBlob] = useState(null);
@@ -204,12 +244,41 @@ export function Practice() {
     const [isPlayingReference, setIsPlayingReference] = useState(false);
     const [cachedAudioUrl, setCachedAudioUrl] = useState(null);
 
+    // Shadowing Mode - 0.8x speed for simultaneous speaking
+    const [isShadowingMode, setIsShadowingMode] = useState(false);
+    const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+
     const maxDuration = 30;
     const currentSentence = sentences?.[currentIndex];
 
-    // Create session on mount
+    // Persist state changes to sessionStorage
+    useEffect(() => {
+        sessionStorage.setItem(STORAGE_KEYS.currentIndex, JSON.stringify(currentIndex));
+    }, [currentIndex]);
+
+    useEffect(() => {
+        if (sessionId !== null) {
+            sessionStorage.setItem(STORAGE_KEYS.sessionId, JSON.stringify(sessionId));
+        }
+    }, [sessionId]);
+
+    useEffect(() => {
+        sessionStorage.setItem(STORAGE_KEYS.assessment, JSON.stringify(assessment));
+    }, [assessment]);
+
+    // Validate currentIndex against loaded sentences
+    useEffect(() => {
+        if (sentences?.length > 0 && currentIndex >= sentences.length) {
+            setCurrentIndex(0);
+        }
+    }, [sentences, currentIndex]);
+
+    // Create session on mount (only if no persisted session)
     useEffect(() => {
         const createSession = async () => {
+            // Skip if we already have a session from storage
+            if (sessionId) return;
+
             try {
                 const { data } = await api.post(ENDPOINTS.SESSIONS.CREATE, {});
                 setSessionId(data.id);
@@ -218,7 +287,7 @@ export function Practice() {
             }
         };
         createSession();
-    }, []);
+    }, [sessionId]);
 
     // Pre-generate TTS audio for sentences when loaded
     useEffect(() => {
@@ -391,6 +460,26 @@ export function Practice() {
         cancelRecording();
     };
 
+    // Reset entire session and start fresh
+    const handleStartFresh = async () => {
+        // Clear persisted state
+        Object.values(STORAGE_KEYS).forEach(key => sessionStorage.removeItem(key));
+
+        // Reset all state
+        setCurrentIndex(0);
+        setAssessment(null);
+        cancelRecording();
+
+        // Create new session
+        try {
+            const { data } = await api.post(ENDPOINTS.SESSIONS.CREATE, {});
+            setSessionId(data.id);
+            toast.success('Started new practice session!');
+        } catch (err) {
+            console.error('Failed to create new session:', err);
+        }
+    };
+
     // Play reference audio (TTS) - uses cached audio for instant playback
     const playReferenceAudio = async () => {
         if (!currentSentence) return;
@@ -407,6 +496,9 @@ export function Practice() {
         if (cachedAudioUrl) {
             const audio = new Audio(cachedAudioUrl);
             referenceAudioRef.current = audio;
+
+            // Apply shadowing mode speed (0.8x for simultaneous speaking)
+            audio.playbackRate = isShadowingMode ? 0.8 : playbackSpeed;
 
             audio.onended = () => setIsPlayingReference(false);
             audio.onerror = () => {
@@ -513,13 +605,27 @@ export function Practice() {
 
     return (
         <div className="practice">
-            {/* Progress Header */}
+            {/* Progress Header with Difficulty Badge */}
             <header className="practice__progress-header">
                 <div className="practice__progress-info">
                     <h1 className="practice__title">Practice Session</h1>
                     <span className="practice__progress-text">
                         {currentIndex + 1} of {sentences.length}
                     </span>
+                    {currentSentence?.difficulty_level && (
+                        <DifficultyBadge level={currentSentence.difficulty_level} />
+                    )}
+                    {currentIndex > 0 && (
+                        <button
+                            type="button"
+                            className="practice__start-fresh-btn"
+                            onClick={handleStartFresh}
+                            title="Start fresh session"
+                        >
+                            <RotateCcw size={14} />
+                            <span>Start Fresh</span>
+                        </button>
+                    )}
                 </div>
                 <div className="practice__progress-bar-container">
                     <div
@@ -605,6 +711,12 @@ export function Practice() {
                                 )}
                             </div>
 
+                            {/* Confidence Meter - Real-time volume feedback */}
+                            <ConfidenceMeter
+                                audioStream={audioStream}
+                                isRecording={isRecording}
+                            />
+
                             {/* Playback audio element */}
                             {audioUrl && <audio ref={audioRef} src={audioUrl} />}
 
@@ -680,15 +792,20 @@ export function Practice() {
                             <div className="practice__score-display">
                                 <ScoreRing score={assessment.overall_score} />
                                 <div className="practice__score-info">
-                                    <div className={`practice__score-label ${assessment.overall_score >= 0.7 ? 'practice__score-label--good' : 'practice__score-label--needs-work'}`}>
+                                    <div
+                                        className={`practice__score-label ${assessment.overall_score >= 0.7 ? 'practice__score-label--good' : 'practice__score-label--needs-work'}`}
+                                        data-tooltip={assessment.overall_score >= 0.7
+                                            ? 'Excellent pronunciation! You can move to harder sentences.'
+                                            : `Score ${Math.round(assessment.overall_score * 100)}% - Try focusing on the highlighted phonemes below.`}
+                                    >
                                         {assessment.overall_score >= 0.7 ? (
                                             <>
-                                                <CheckCircle size={24} />
+                                                <CheckCircle size={24} className="practice__score-icon" />
                                                 <span>Great job!</span>
                                             </>
                                         ) : (
                                             <>
-                                                <AlertCircle size={24} />
+                                                <AlertCircle size={24} className="practice__score-icon" />
                                                 <span>Keep practicing</span>
                                             </>
                                         )}
@@ -754,6 +871,63 @@ export function Practice() {
                     )}
                 </section>
             </main>
+
+            {/* Insight Zone - Metrics & Recommendations */}
+            {assessment && (
+                <section className="practice__insight-zone">
+                    <div className="practice__metrics-row">
+                        <MetricCard
+                            label="Accuracy"
+                            value={Math.round(assessment.overall_score * 100)}
+                            unit="%"
+                            icon={Target}
+                            trend={assessment.overall_score >= 0.7 ? 'up' : 'down'}
+                        />
+                        <MetricCard
+                            label="Fluency"
+                            value={assessment.fluency_score ? Math.round(assessment.fluency_score * 100) : '--'}
+                            unit={assessment.fluency_score ? '%' : ''}
+                            icon={Gauge}
+                            trend={assessment.fluency_score >= 0.7 ? 'up' : assessment.fluency_score >= 0.5 ? 'neutral' : 'down'}
+                        />
+                        <MetricCard
+                            label="Clarity"
+                            value={assessment.clarity_score ? Math.round(assessment.clarity_score * 100) : Math.round(assessment.overall_score * 100)}
+                            unit="%"
+                            icon={BarChart3}
+                            trend={assessment.clarity_score >= 0.7 ? 'up' : assessment.clarity_score >= 0.5 ? 'neutral' : 'down'}
+                        />
+                        <RecommendationCard
+                            weakPhonemes={assessment.weak_phonemes || []}
+                            overallScore={assessment.overall_score}
+                            onAction={(type) => {
+                                if (type === 'advance' && currentIndex < sentences.length - 1) {
+                                    handleNext();
+                                } else if (type === 'retry' || type === 'learn') {
+                                    handleTryAgain();
+                                } else if (type === 'practice') {
+                                    navigate('/phonemes');
+                                }
+                            }}
+                        />
+                    </div>
+
+                    {/* Advanced Insights - Collapsible Panel */}
+                    <InsightsPanel isOpen={true} title="Advanced Insights & AI Feedback">
+                        <div className="insights-grid">
+                            <AIRecommendations
+                                assessment={assessment}
+                                currentSentence={currentSentence}
+                            />
+                            <ComparisonVisualizer
+                                userAudioUrl={audioUrl}
+                                referenceAudioUrl={cachedAudioUrl}
+                            />
+                        </div>
+                    </InsightsPanel>
+                </section>
+            )}
+
 
             {/* Navigation */}
             <footer className="practice__nav">

@@ -1,9 +1,9 @@
 /**
  * Dashboard Page - Three-Column Grid Layout
- * Full viewport adaptive with profile, stats, charts, and activity heatmap
+ * Full viewport adaptive with profile, stats, and charts
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
     Mic,
@@ -16,7 +16,8 @@ import {
     Sparkles,
     Trophy,
     Star,
-    Zap
+    Zap,
+    CheckCircle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useApi } from '../hooks/useApi';
@@ -24,6 +25,7 @@ import { ENDPOINTS } from '../api/endpoints';
 import { Spinner } from '../components/Loader';
 import { ErrorState } from '../components/ErrorState';
 import './Dashboard.css';
+import '../components/progress/MilestonesBadges.css'; // Import badge styles
 
 // Progress Ring Component
 function ProgressRing({ progress, size = 100, strokeWidth = 10 }) {
@@ -121,13 +123,13 @@ function Sparkline({ data = [], color = '#047857' }) {
 }
 
 // Weekly Progress Chart Component with Smooth Curves and Tooltips
-function WeeklyChart({ data = [] }) {
+function WeeklyChart({ data = [], labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] }) {
     const canvasRef = useRef(null);
     const containerRef = useRef(null);
     const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, day: '', score: 0 });
 
-    const chartData = data.length > 0 ? data : [65, 72, 68, 75, 80, 78, 85];
-    const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const chartData = data.length > 0 ? data : [0, 0, 0, 0, 0, 0, 0];
+
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -309,68 +311,143 @@ function WeeklyChart({ data = [] }) {
     );
 }
 
-// Activity Heatmap Component
-function ActivityHeatmap({ data = {} }) {
-    // Generate last 12 weeks of data
-    const generateHeatmapData = () => {
-        const weeks = [];
-        const today = new Date();
+// Milestone definitions with icons and thresholds
+const MILESTONE_DEFINITIONS = [
+    {
+        id: 'first_practice',
+        name: 'First Steps',
+        description: 'Complete your first practice session',
+        icon: Star,
+        threshold: 1,
+        field: 'total_attempts',
+        color: '#f59e0b'
+    },
+    {
+        id: 'streak_7',
+        name: 'Week Warrior',
+        description: 'Achieve a 7-day practice streak',
+        icon: Flame,
+        threshold: 7,
+        field: 'current_streak',
+        color: '#ef4444'
+    },
+    {
+        id: 'attempts_50',
+        name: 'Dedicated Learner',
+        description: 'Complete 50 practice attempts',
+        icon: Target,
+        threshold: 50,
+        field: 'total_attempts',
+        color: '#10b981'
+    },
+    {
+        id: 'attempts_100',
+        name: 'Century Club',
+        description: 'Complete 100 practice attempts',
+        icon: Trophy,
+        threshold: 100,
+        field: 'total_attempts',
+        color: '#14b8a6'
+    },
+];
 
-        for (let w = 11; w >= 0; w--) {
-            const week = [];
-            for (let d = 0; d < 7; d++) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - (w * 7 + (6 - d)));
-                const dateStr = date.toISOString().split('T')[0];
-                const level = data[dateStr] || Math.floor(Math.random() * 5);
-                week.push({ date: dateStr, level });
-            }
-            weeks.push(week);
-        }
-        return weeks;
-    };
-
-    const heatmapData = generateHeatmapData();
+function MilestoneBadge({ milestone, progress, isEarned, isNew }) {
+    const Icon = milestone.icon;
+    const progressPercent = Math.min((progress / milestone.threshold) * 100, 100);
 
     return (
-        <div className="dashboard__heatmap-section">
-            <div className="dashboard__heatmap-card">
-                <div className="dashboard__heatmap-header">
-                    <h3 className="dashboard__heatmap-title">Practice Activity</h3>
-                    <div className="dashboard__heatmap-legend">
-                        <span className="dashboard__heatmap-legend-label">Less</span>
-                        <div className="dashboard__heatmap-legend-boxes">
-                            <div className="dashboard__heatmap-legend-box dashboard__heatmap-legend-box--0" />
-                            <div className="dashboard__heatmap-legend-box dashboard__heatmap-legend-box--1" />
-                            <div className="dashboard__heatmap-legend-box dashboard__heatmap-legend-box--2" />
-                            <div className="dashboard__heatmap-legend-box dashboard__heatmap-legend-box--3" />
-                            <div className="dashboard__heatmap-legend-box dashboard__heatmap-legend-box--4" />
-                        </div>
-                        <span>More</span>
-                    </div>
-                </div>
-                <div className="dashboard__heatmap-grid">
-                    {heatmapData.map((week, weekIndex) => (
-                        <div key={weekIndex} className="dashboard__heatmap-week">
-                            {week.map((day, dayIndex) => (
-                                <div
-                                    key={dayIndex}
-                                    className={`dashboard__heatmap-day dashboard__heatmap-day--level-${day.level}`}
-                                    title={`${day.date}: ${day.level} sessions`}
-                                />
-                            ))}
-                        </div>
-                    ))}
-                </div>
+        <div
+            className={`milestone-badge ${isEarned ? 'milestone-badge--earned' : ''} ${isNew ? 'milestone-badge--new' : ''}`}
+            title={milestone.description}
+        >
+            <div
+                className="milestone-badge__icon-wrapper"
+                style={{
+                    '--milestone-color': milestone.color,
+                    '--progress-percent': `${progressPercent}%`
+                }}
+            >
+                <Icon
+                    size={24}
+                    className="milestone-badge__icon"
+                    aria-hidden="true"
+                />
+                {isEarned && (
+                    <CheckCircle
+                        size={12}
+                        className="milestone-badge__check"
+                        aria-hidden="true"
+                    />
+                )}
+                {!isEarned && (
+                    <svg className="milestone-badge__progress-ring" viewBox="0 0 36 36">
+                        <path
+                            className="milestone-badge__progress-bg"
+                            d="M18 2.0845
+                               a 15.9155 15.9155 0 0 1 0 31.831
+                               a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        <path
+                            className="milestone-badge__progress-fill"
+                            strokeDasharray={`${progressPercent}, 100`}
+                            d="M18 2.0845
+                               a 15.9155 15.9155 0 0 1 0 31.831
+                               a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                    </svg>
+                )}
             </div>
+            <span className="milestone-badge__name">{milestone.name}</span>
+            {!isEarned && (
+                <span className="milestone-badge__progress-text">
+                    {Math.round(progress)}/{milestone.threshold}
+                </span>
+            )}
         </div>
     );
 }
+
+
+
 
 export function Dashboard() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { data: progress, isLoading, error, refetch } = useApi(ENDPOINTS.ANALYTICS.PROGRESS);
+
+    // Calculate milestones directly from progress data
+    const milestones = useMemo(() => {
+        const stats = progress || {};
+        return MILESTONE_DEFINITIONS.map(milestone => {
+            let currentValue = 0;
+
+            switch (milestone.field) {
+                case 'total_attempts':
+                    currentValue = stats.attempt_stats?.total_attempts || stats.total_attempts || 0;
+                    break;
+                case 'current_streak':
+                    currentValue = stats.streak?.current_streak || 0;
+                    break;
+                case 'overall_average_score':
+                    currentValue = stats.attempt_stats?.avg_score || stats.overall_average_score || 0;
+                    break;
+                case 'mastered_phonemes_count':
+                    currentValue = stats.current_strong_phonemes?.length || 0;
+                    break;
+                default:
+                    currentValue = 0;
+            }
+
+            const isEarned = currentValue >= milestone.threshold;
+
+            return {
+                ...milestone,
+                progress: currentValue,
+                isEarned,
+                isNew: false
+            };
+        });
+    }, [progress]);
 
     if (isLoading) {
         return (
@@ -403,8 +480,9 @@ export function Dashboard() {
         streak_days: stats.streak?.current_streak ?? stats.streak_days ?? 0,
         weak_phonemes: stats.current_weak_phonemes || [],
         weak_phonemes_count: stats.current_weak_phonemes?.length ?? stats.weak_phonemes_count ?? 0,
-        daily_goal_progress: stats.daily_goal_progress || 60,
-        weekly_scores: stats.weekly_scores || [65, 72, 68, 75, 80, 78, 85],
+        daily_goal_progress: stats.daily_goal_progress || 0,
+        weekly_scores: stats.weekly_scores || [0, 0, 0, 0, 0, 0, 0],
+        weekly_labels: stats.weekly_labels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     };
 
     const hasNoActivity = normalizedStats.total_attempts === 0;
@@ -464,19 +542,20 @@ export function Dashboard() {
                     {/* Achievements */}
                     <div className="dashboard__achievements">
                         <h3 className="dashboard__section-title">Recent Badges</h3>
-                        <div className="dashboard__badges">
-                            <div className="dashboard__badge dashboard__badge--earned" title="First Practice">
-                                <span className="dashboard__badge-icon">🎯</span>
-                            </div>
-                            <div className="dashboard__badge dashboard__badge--earned" title="3-Day Streak">
-                                <span className="dashboard__badge-icon">🔥</span>
-                            </div>
-                            <div className="dashboard__badge" title="Week Warrior (Locked)">
-                                <span className="dashboard__badge-icon">🏆</span>
-                            </div>
-                            <div className="dashboard__badge" title="Perfect Score (Locked)">
-                                <span className="dashboard__badge-icon">⭐</span>
-                            </div>
+                        <div className="dashboard__badges" style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
+                            gap: '1rem',
+                            marginTop: '0.5rem'
+                        }}>
+                            {milestones.map(milestone => (
+                                <MilestoneBadge
+                                    key={milestone.id}
+                                    milestone={milestone}
+                                    progress={milestone.progress}
+                                    isEarned={milestone.isEarned}
+                                />
+                            ))}
                         </div>
                     </div>
                 </aside>
@@ -536,7 +615,7 @@ export function Dashboard() {
                             <h3 className="dashboard__chart-title">Weekly Progress</h3>
                             <span className="dashboard__chart-period">Last 7 days</span>
                         </div>
-                        <WeeklyChart data={normalizedStats.weekly_scores} />
+                        <WeeklyChart data={normalizedStats.weekly_scores} labels={normalizedStats.weekly_labels} />
                     </div>
 
                     {/* AI Insight */}
@@ -621,11 +700,30 @@ export function Dashboard() {
                     </div>
                 </aside>
 
-                {/* Activity Heatmap - Full Width */}
-                <ActivityHeatmap />
+
+                {/* Bottom Section - 2x2 Grid */}
+                <section className="dashboard__bottom-section" style={{
+                    gridColumn: '1 / -1',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    gap: '1.5rem',
+                    marginTop: '0.5rem'
+                }}>
+                    <SessionHistory />
+                    <QuickPractice />
+                    <PhonemeMastery />
+                    <LearningTips />
+                </section>
+
             </div>
         </div>
     );
 }
+
+// Lazy load bottom components to avoid circular deps if any
+import { SessionHistory } from '../components/dashboard/bottom/SessionHistory';
+import { QuickPractice } from '../components/dashboard/bottom/QuickPractice';
+import { PhonemeMastery } from '../components/dashboard/bottom/PhonemeMastery';
+import { LearningTips } from '../components/dashboard/bottom/LearningTips';
 
 export default Dashboard;
