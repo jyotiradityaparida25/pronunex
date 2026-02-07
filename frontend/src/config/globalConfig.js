@@ -8,6 +8,7 @@ export const DEFAULT_SETTINGS = {
     theme: 'light', // 'light' | 'dark'
     primaryColor: '#059669', // Emerald-500
     fontScale: 100,
+    mascotTheme: 'theme-green',
 
     // Notifications
     emailReminders: false,

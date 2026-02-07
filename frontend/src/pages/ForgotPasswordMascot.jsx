@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Mail } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
-// import { useAuth } from '../context/AuthContext'; // Import this if your auth context has a reset function
 import { useUI } from '../context/UIContext';
+import { useSettings } from '../context/SettingsContext'; // IMPORT SETTINGS
 import { Spinner } from '../components/Loader';
 import './LoginMascot.css';
 
 const ForgotPasswordMascot = () => {
-  // const { resetPassword } = useAuth(); // Enable if available
   const { toast } = useUI();
+
+  // GET GLOBAL SETTINGS
+  const { settings } = useSettings();
+  const currentTheme = settings?.mascotTheme || 'theme-purple'; // Default to purple if not set
 
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState('theme-purple'); // Default to purple for this page?
 
   // Eye Tracking Logic
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -44,6 +46,7 @@ const ForgotPasswordMascot = () => {
 
   return (
     <div className="mascot-login-wrapper">
+      {/* Apply Global Theme Class Here */}
       <div className={`mascot-login-container ${currentTheme}`}>
         
         {/* --- LEFT SIDE: MASCOT --- */}
@@ -52,10 +55,14 @@ const ForgotPasswordMascot = () => {
             <div className="mascot-eyes">
               {/* Pupils are slightly smaller to look "confused/worried" */}
               <div className="eye-socket">
-                <div ref={leftEyeRef} className="eye-pupil" style={{ width: '15px', height: '15px', transform: `rotate(${calculateEyeRotation(leftEyeRef)}deg) translateY(8px)` }}><div className="eye-shine" style={{width:'5px', height:'5px'}}></div></div>
+                <div ref={leftEyeRef} className="eye-pupil" style={{ width: '15px', height: '15px', transform: `rotate(${calculateEyeRotation(leftEyeRef)}deg) translateY(8px)` }}>
+                    <div className="eye-shine" style={{width:'5px', height:'5px'}}></div>
+                </div>
               </div>
               <div className="eye-socket">
-                <div ref={rightEyeRef} className="eye-pupil" style={{ width: '15px', height: '15px', transform: `rotate(${calculateEyeRotation(rightEyeRef)}deg) translateY(8px)` }}><div className="eye-shine" style={{width:'5px', height:'5px'}}></div></div>
+                <div ref={rightEyeRef} className="eye-pupil" style={{ width: '15px', height: '15px', transform: `rotate(${calculateEyeRotation(rightEyeRef)}deg) translateY(8px)` }}>
+                    <div className="eye-shine" style={{width:'5px', height:'5px'}}></div>
+                </div>
               </div>
             </div>
             {/* Mouth is a small "o" for surprise */}
@@ -88,11 +95,7 @@ const ForgotPasswordMascot = () => {
                 </button>
               </form>
 
-              <div className="theme-switcher">
-                  <div className={`theme-btn bg-emerald-500 ${currentTheme === 'theme-green' ? 'active' : ''}`} onClick={() => setCurrentTheme('theme-green')}></div>
-                  <div className={`theme-btn bg-blue-500 ${currentTheme === 'theme-blue' ? 'active' : ''}`} onClick={() => setCurrentTheme('theme-blue')}></div>
-                  <div className={`theme-btn bg-purple-500 ${currentTheme === 'theme-purple' ? 'active' : ''}`} onClick={() => setCurrentTheme('theme-purple')}></div>
-               </div>
+              {/* Removed Theme Switcher (Now handled in Settings) */}
           </div>
         </div>
 
