@@ -1,11 +1,6 @@
-/**
- * Login Page
- * JWT authentication form
- */
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, LogIn, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { Spinner } from '../components/Loader';
@@ -27,7 +22,6 @@ export function Login() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
-        // Clear error on change
         if (errors[name]) {
             setErrors((prev) => ({ ...prev, [name]: null }));
         }
@@ -70,10 +64,17 @@ export function Login() {
     return (
         <div className="auth-page">
             <div className="auth-container">
+                <Link to="/" className="auth-back-btn">
+                    <ArrowLeft size={18} />
+                    <span>Back</span>
+                </Link>
+
                 <div className="auth-header">
-                    <div className="auth-logo">
-                        <img src="/icon.png" alt="Pronunex" />
-                    </div>
+                    <Link to="/" className="auth-logo-link">
+                        <div className="auth-logo">
+                            <img src="/icon.png" alt="Pronunex" />
+                        </div>
+                    </Link>
                     <h1 className="auth-title">Welcome Back</h1>
                     <p className="auth-subtitle">Sign in to continue your practice</p>
                 </div>
@@ -86,9 +87,7 @@ export function Login() {
                     )}
 
                     <div className="form-group">
-                        <label htmlFor="email" className="form-label">
-                            Email
-                        </label>
+                        <label htmlFor="email" className="form-label">Email</label>
                         <div className="input-wrapper">
                             <Mail className="input-icon" size={18} />
                             <input
@@ -107,9 +106,7 @@ export function Login() {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password" className="form-label">
-                            Password
-                        </label>
+                        <label htmlFor="password" className="form-label">Password</label>
                         <div className="input-wrapper">
                             <Lock className="input-icon" size={18} />
                             <input
@@ -133,6 +130,12 @@ export function Login() {
                             </button>
                         </div>
                         {errors.password && <span className="form-error">{errors.password}</span>}
+                    </div>
+
+                    <div className="form-options">
+                        <Link to="/forgot-password" class="auth-link auth-link--sm">
+                            Forgot Password?
+                        </Link>
                     </div>
 
                     <button

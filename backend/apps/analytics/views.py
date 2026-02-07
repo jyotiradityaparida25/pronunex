@@ -47,7 +47,11 @@ class ProgressDashboardView(APIView):
             'score_trend': stats['score_trend'],
             'recent_progress': UserProgressSerializer(stats['recent_progress'], many=True).data,
             'streak': StreakSerializer(stats['streak']).data,
+
             'phoneme_progress': PhonemeProgressSerializer(stats['phoneme_progress'], many=True).data,
+            'weekly_scores': stats['weekly_scores'],
+            'weekly_labels': stats['weekly_labels'],
+            'daily_goal_progress': stats.get('daily_goal_progress', 0),
         }
         
         return Response(response_data)

@@ -1,11 +1,6 @@
-/**
- * Signup Page
- * User registration form
- */
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, Eye, EyeOff, UserPlus } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, UserPlus, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { Spinner } from '../components/Loader';
@@ -37,22 +32,13 @@ export function Signup() {
 
     const validate = () => {
         const newErrors = {};
-        if (!formData.username.trim()) {
-            newErrors.username = 'Username is required';
-        }
-        if (!formData.email) {
-            newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Invalid email format';
-        }
-        if (!formData.password) {
-            newErrors.password = 'Password is required';
-        } else if (formData.password.length < 8) {
-            newErrors.password = 'Password must be at least 8 characters';
-        }
-        if (formData.password !== formData.password_confirm) {
-            newErrors.password_confirm = 'Passwords do not match';
-        }
+        if (!formData.username.trim()) newErrors.username = 'Username is required';
+        if (!formData.email) newErrors.email = 'Email is required';
+        else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Invalid email format';
+        if (!formData.password) newErrors.password = 'Password is required';
+        else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+        if (formData.password !== formData.password_confirm) newErrors.password_confirm = 'Passwords do not match';
+        
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -73,23 +59,12 @@ export function Signup() {
             toast.success('Account created successfully!');
             navigate('/');
         } catch (error) {
-            // Parse backend validation errors
             const errorData = error.data || {};
             const newErrors = {};
-
-            if (errorData.email) {
-                newErrors.email = Array.isArray(errorData.email) ? errorData.email[0] : errorData.email;
-            }
-            if (errorData.username) {
-                newErrors.username = Array.isArray(errorData.username) ? errorData.username[0] : errorData.username;
-            }
-            if (errorData.password) {
-                newErrors.password = Array.isArray(errorData.password) ? errorData.password[0] : errorData.password;
-            }
-            if (errorData.password_confirm) {
-                newErrors.password_confirm = Array.isArray(errorData.password_confirm) ? errorData.password_confirm[0] : errorData.password_confirm;
-            }
-
+            if (errorData.email) newErrors.email = Array.isArray(errorData.email) ? errorData.email[0] : errorData.email;
+            if (errorData.username) newErrors.username = Array.isArray(errorData.username) ? errorData.username[0] : errorData.username;
+            if (errorData.password) newErrors.password = Array.isArray(errorData.password) ? errorData.password[0] : errorData.password;
+            
             if (Object.keys(newErrors).length > 0) {
                 setErrors(newErrors);
             } else {
@@ -103,10 +78,17 @@ export function Signup() {
     return (
         <div className="auth-page">
             <div className="auth-container">
+                <Link to="/" className="auth-back-btn">
+                    <ArrowLeft size={18} />
+                    <span>Back</span>
+                </Link>
+
                 <div className="auth-header">
-                    <div className="auth-logo">
-                        <img src="/icon.png" alt="Pronunex" />
-                    </div>
+                    <Link to="/" className="auth-logo-link">
+                        <div className="auth-logo">
+                            <img src="/icon.png" alt="Pronunex" />
+                        </div>
+                    </Link>
                     <h1 className="auth-title">Create Account</h1>
                     <p className="auth-subtitle">Start improving your pronunciation today</p>
                 </div>
@@ -114,9 +96,7 @@ export function Signup() {
                 <form className="auth-form" onSubmit={handleSubmit}>
                     <div className="form-row">
                         <div className="form-group">
-                            <label htmlFor="username" className="form-label">
-                                Username
-                            </label>
+                            <label htmlFor="username" className="form-label">Username</label>
                             <div className="input-wrapper">
                                 <User className="input-icon" size={18} />
                                 <input
@@ -134,9 +114,7 @@ export function Signup() {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="full_name" className="form-label">
-                                Full Name
-                            </label>
+                            <label htmlFor="full_name" className="form-label">Full Name</label>
                             <div className="input-wrapper">
                                 <User className="input-icon" size={18} />
                                 <input
@@ -154,9 +132,7 @@ export function Signup() {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="email" className="form-label">
-                            Email
-                        </label>
+                        <label htmlFor="email" className="form-label">Email</label>
                         <div className="input-wrapper">
                             <Mail className="input-icon" size={18} />
                             <input
@@ -175,9 +151,7 @@ export function Signup() {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password" className="form-label">
-                            Password
-                        </label>
+                        <label htmlFor="password" className="form-label">Password</label>
                         <div className="input-wrapper">
                             <Lock className="input-icon" size={18} />
                             <input
@@ -204,9 +178,7 @@ export function Signup() {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password_confirm" className="form-label">
-                            Confirm Password
-                        </label>
+                        <label htmlFor="password_confirm" className="form-label">Confirm Password</label>
                         <div className="input-wrapper">
                             <Lock className="input-icon" size={18} />
                             <input
@@ -221,9 +193,7 @@ export function Signup() {
                                 disabled={isLoading}
                             />
                         </div>
-                        {errors.password_confirm && (
-                            <span className="form-error">{errors.password_confirm}</span>
-                        )}
+                        {errors.password_confirm && <span className="form-error">{errors.password_confirm}</span>}
                     </div>
 
                     <button

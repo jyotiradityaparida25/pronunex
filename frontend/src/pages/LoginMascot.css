@@ -1,0 +1,211 @@
+/* frontend/src/pages/LoginMascot.css */
+
+/* --- 1. BASE LAYOUT --- */
+.mascot-login-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    background-color: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.mascot-login-container {
+    display: flex;
+    width: 100%;
+    max-width: 1000px;
+    min-height: 650px;
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+/* Left Panel (Mascot) */
+.mascot-panel {
+    width: 50%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: background-color 0.5s ease;
+    padding: 40px;
+}
+
+/* Right Panel (Form) */
+.form-panel {
+    width: 50%;
+    padding: 40px 50px;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    position: relative;
+    justify-content: center; /* Vertically center form */
+}
+
+/* Back Button Wrapper */
+.back-button-wrapper {
+    margin-bottom: 20px;
+}
+.back-btn-styled {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.back-btn-styled:hover { color: #334155; }
+
+
+/* --- 2. RESPONSIVE (Mobile) --- */
+@media (max-width: 850px) {
+    .mascot-login-container { flex-direction: column; height: auto; }
+    .mascot-panel, .form-panel { width: 100%; padding: 40px 30px; }
+    .mascot-panel { min-height: 350px; order: 1; }
+    .form-panel { order: 2; }
+    .back-button-wrapper { display: none; }
+}
+
+
+/* --- 3. MASCOT STRUCTURE --- */
+.mascot-body {
+    width: 220px;
+    height: 220px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 60px;
+    z-index: 10;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
+}
+
+.mascot-body:hover { transform: scale(1.03) translateY(-5px); }
+
+.mascot-eyes { display: flex; gap: 16px; margin-bottom: 22px; }
+
+.eye-socket {
+    width: 52px; height: 52px;
+    background: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.1);
+    border: 3px solid rgba(255,255,255,0.5);
+}
+
+.eye-pupil {
+    width: 20px; height: 20px;
+    background: #0f172a;
+    border-radius: 50%;
+    position: relative;
+}
+
+.eye-shine {
+    width: 7px; height: 7px;
+    background: white;
+    border-radius: 50%;
+    position: absolute; top: 3px; left: 3px;
+}
+
+.mascot-shadow {
+    width: 160px; height: 20px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 50%;
+    filter: blur(10px);
+    margin-top: -15px;
+    z-index: 0;
+    transition: all 0.5s ease;
+}
+
+.mascot-title { margin-top: 40px; font-size: 32px; font-weight: 800; letter-spacing: -0.03em; transition: color 0.5s ease;}
+.mascot-subtitle { margin-top: 8px; font-size: 16px; font-weight: 600; transition: color 0.5s ease; }
+
+
+/* --- 4. THEMES --- */
+/* Theme 1: Green */
+.theme-green .mascot-panel { background-color: #ecfdf5; }
+.theme-green .mascot-body { background: linear-gradient(135deg, #10b981, #047857); border-radius: 40px; }
+.theme-green .mascot-title { color: #065f46; }
+.theme-green .mascot-subtitle { color: #059669; }
+.theme-green .btn-theme { background-color: #10b981; }
+.theme-green .btn-theme:hover { background-color: #059669; }
+.theme-green .text-theme { color: #10b981; }
+.theme-green .input-theme:focus { border-color: #10b981; }
+
+/* Theme 2: Blue */
+.theme-blue .mascot-panel { background-color: #f0f9ff; }
+.theme-blue .mascot-body { background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 50%; }
+.theme-blue .mascot-title { color: #1e40af; }
+.theme-blue .mascot-subtitle { color: #2563eb; }
+.theme-blue .btn-theme { background-color: #3b82f6; }
+.theme-blue .btn-theme:hover { background-color: #1d4ed8; }
+.theme-blue .text-theme { color: #3b82f6; }
+.theme-blue .input-theme:focus { border-color: #3b82f6; }
+
+/* Theme 3: Purple */
+.theme-purple .mascot-panel { background-color: #faf5ff; }
+.theme-purple .mascot-body { background: linear-gradient(135deg, #a855f7, #7e22ce); border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%; }
+.theme-purple .mascot-title { color: #6b21a8; }
+.theme-purple .mascot-subtitle { color: #9333ea; }
+.theme-purple .btn-theme { background-color: #a855f7; }
+.theme-purple .btn-theme:hover { background-color: #7e22ce; }
+.theme-purple .text-theme { color: #a855f7; }
+.theme-purple .input-theme:focus { border-color: #a855f7; }
+
+/* Theme Switcher Dots */
+.theme-switcher {
+    display: flex; gap: 10px; justify-content: center; margin-top: 30px;
+}
+.theme-btn { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s;}
+.theme-btn:hover { transform: scale(1.2); }
+.theme-btn.active { box-shadow: 0 0 0 2px #333; }
+
+
+/* --- 5. GOOGLE BUTTON STYLES (Consolidated) --- */
+.divider {
+    display: flex; align-items: center; text-align: center; margin: 25px 0; color: #94a3b8; font-size: 13px; font-weight: 600;
+}
+.divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
+.divider:not(:empty)::before { margin-right: 15px; }
+.divider:not(:empty)::after { margin-left: 15px; }
+
+.google-btn {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-weight: 600;
+    color: #475569;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0;
+}
+
+.google-btn:hover {
+    background-color: #f8fafc;
+    border-color: #94a3b8;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* FIX for huge SVG */
+.google-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px;
+}
